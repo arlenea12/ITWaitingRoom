@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT Department Waiting Room</title>
+  
+  <!-- Link to External CSS -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Load Spotify Web Playback SDK -->
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+</head>
+<body>
+  <!-- Fullscreen Canvas Background -->
+  <canvas id="background-canvas"></canvas>
+  
+  <!-- Main Content -->
+  <div class="container">
+    <header>
+      <h1>Welcome to the IT Department</h1>
+      <p>Enjoy the music and meet our team while you wait!</p>
+    </header>
+    
+    <!-- Team Introduction Section -->
+    <section class="team-section" id="team">
+      <h2>Meet the Team</h2>
+
+      <!-- Custom Navigation Buttons -->
+      <div class="custom-nav">
+        <button onclick="document.getElementById('team').scrollIntoView({behavior: 'smooth'});">Team</button>
+        <button onclick="document.getElementById('spotify').scrollIntoView({behavior: 'smooth'});">Spotify</button>
+        <button onclick="window.location.href='https://example.com';">External Link</button>
+      </div>
+
+      <div class="team">
+        <div class="team-member">
+          <img src="Photos/buttercup.jpg" alt="Arlene Alvarado">
+          <div class="info">
+            <h3>Arlene Alvarado</h3>
+            <p>Bot</p>
+          </div>
+        </div>
+        <div class="team-member">
+          <img src="https://via.placeholder.com/280x200" alt="Team Member 2">
+          <div class="info">
+            <h3>Seth McCullar</h3>
+            <p>System Administrator</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Spotify Playlist Section -->
+    <section class="spotify" id="spotify">
+      <h2>Our Spotify Playlist</h2>
+      <!-- Adjusted height for the embedded Spotify player -->
+      <iframe style="border-radius:12px" 
+              src="https://open.spotify.com/embed/playlist/0sXmN2Mjk4xmgeaABkSGAk?utm_source=generator" 
+              width="100%" height="300" 
+              frameborder="0" 
+              allowfullscreen="" 
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+              loading="lazy">
+      </iframe>
+    </section>
+  </div>
+  
+  <!-- External JavaScript for OAuth, Spotify Integration, and Background Effects -->
+  <script src="script.js"></script>
+</body>
+</html>
