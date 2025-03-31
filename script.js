@@ -1,5 +1,3 @@
-// script.js
-
 (function () {
   const client_id = 'cde3eaa90edd4d8893a89046e3056912';
   const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
@@ -61,9 +59,25 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   player.addListener('player_state_changed', state => {
     if (!state) return;
     const currentTrack = state.track_window.current_track;
-    document.getElementById('trackName').textContent = currentTrack.name;
-    document.getElementById('artistName').textContent = currentTrack.artists.map(artist => artist.name).join(', ');
-    document.getElementById('albumArt').src = currentTrack.album.images[0].url;
+
+    const trackName = document.getElementById('trackName');
+    const artistName = document.getElementById('artistName');
+    const albumArt = document.getElementById('albumArt');
+
+    // Add fade animation
+    trackName.classList.add('fade-out');
+    artistName.classList.add('fade-out');
+    albumArt.classList.add('fade-out');
+
+    setTimeout(() => {
+      trackName.textContent = currentTrack.name;
+      artistName.textContent = currentTrack.artists.map(artist => artist.name).join(', ');
+      albumArt.src = currentTrack.album.images[0].url;
+
+      trackName.classList.remove('fade-out');
+      artistName.classList.remove('fade-out');
+      albumArt.classList.remove('fade-out');
+    }, 300);
 
     isPaused = state.paused;
     document.getElementById('playPauseButton').textContent = isPaused ? 'Play' : 'Pause';
