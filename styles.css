@@ -3,8 +3,11 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  min-height: 100%;   /* Allow the page to extend beyond the viewport */
+  min-height: 100%;
   font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #f0f0f0;
+  overflow-x: hidden;
 }
 
 /* Background Canvas */
@@ -24,7 +27,6 @@ html, body {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  color: #f0f0f0;
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
@@ -75,20 +77,121 @@ h2 {
   padding: 15px;
 }
 
-.custom-nav button:hover {
-  background-color: #2a5298;
+.custom-nav {
+  text-align: center;
+  margin-bottom: 30px;
 }
 
-/* Spotify Section */
+.custom-nav button {
+  margin: 5px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 30px;
+  background-color: #1db954;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-nav button:hover {
+  background-color: #1ed760;
+}
+
+/* Spotify Player UI */
 .spotify {
   text-align: center;
   margin: 40px 0;
 }
 
-/* Responsive */
+.player-ui {
+  background: rgba(0, 0, 0, 0.65);
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s ease;
+}
+
+.player-ui:hover {
+  transform: scale(1.02);
+}
+
+.player-ui img {
+  width: 100%;
+  max-width: 220px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.player-ui h2,
+.player-ui h4 {
+  margin: 10px 0;
+}
+
+/* Controls */
+.controls {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.controls button {
+  background-color: #1db954;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  min-width: 160px;
+}
+
+.controls button:hover {
+  background-color: #1ed760;
+}
+
+#volumeControl {
+  width: 80%;
+  max-width: 200px;
+  cursor: pointer;
+  accent-color: #1db954;
+}
+
+/* Animation for Track Change */
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#trackName,
+#artistName,
+#albumArt {
+  transition: opacity 0.3s ease;
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
   .team {
     flex-direction: column;
     align-items: center;
+  }
+
+  .player-ui {
+    padding: 20px;
+  }
+
+  .controls button {
+    font-size: 0.95rem;
+    padding: 8px 16px;
+  }
+
+  #volumeControl {
+    width: 100%;
   }
 }
