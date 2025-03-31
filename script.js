@@ -63,65 +63,37 @@ window.onSpotifyWebPlaybackSDKReady = () => {
 
   // When the player is ready, transfer playback to it
   player.addListener('ready', ({ device_id }) => {
-    console.log('Ready with Device ID', device_id);
+  console.log('Ready with Device ID', device_id);
 
-    // =====================
-    // Enable Shuffle Mode (important: must be done before playback)
-    // =====================
-    fetch('https://api.spotify.com/v1/me/player/shuffle?state=true', {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
-    }).then(res => {
-      if (res.ok) {
-        console.log('Shuffle enabled');
-      } else {
-        res.text().then(text => console.error('Shuffle error:', text));
-      }
-    });
-    console.log('Ready with Device ID', device_id);
-    fetch('https://api.spotify.com/v1/me/player', {
+  // 1. Enable Shuffle
+  fetch(`https://api.spotify.com/v1/me/player/shuffle?state=true`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  }).then(() => {
+    console.log('Shuffle request sent');
+
+    // 2. Start playback of the playlist after shuffle is enabled
+    return fetch('https://api.spotify.com/v1/me/player/play', {
       method: 'PUT',
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        device_ids: [device_id],
-        play: true
+        context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
+        offset: { position: 0 },
+        position_ms: 0
       })
-    }).then(response => {
-      if (response.ok) {
-        console.log('Playback transferred to device', device_id);
-      } else {
-        response.text().then(text => console.error('Transfer error:', text));
-      }
-    }).catch(err => console.error('Error transferring playback:', err));
-  });
-
-  player.addListener('not_ready', ({ device_id }) => {
-    console.log('Device ID has gone offline', device_id);
-  });
-
-  // Connect the player
-  player.connect();
-};
-
-// =====================
-// 3. Background Particles Code
-// =====================
-
-const canvas = document.getElementById('background-canvas');
-const ctx = canvas.getContext('2d');
-
-let width = canvas.width = window.innerWidth;
-let height = canvas.height = window.innerHeight;
-
-window.addEventListener('resize', () => {
-  width = canvas.width = window.innerWidth;
-  height = canvas.height = window.innerHeight;
-  initParticles();
+    });
+  }).then(res => {
+    if (res.ok) {
+      console.log('Playback started with shuffle!');
+    } else {
+      res.text().then(text => console.error('Playback error:', text));
+    }
+  }).catch(err => console.error('Setup error:', err));
 });
 
 class Particle {
