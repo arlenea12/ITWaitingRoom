@@ -64,6 +64,23 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   // When the player is ready, transfer playback to it
   player.addListener('ready', ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
+
+    // =====================
+    // Enable Shuffle Mode (important: must be done before playback)
+    // =====================
+    fetch('https://api.spotify.com/v1/me/player/shuffle?state=true', {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    }).then(res => {
+      if (res.ok) {
+        console.log('Shuffle enabled');
+      } else {
+        res.text().then(text => console.error('Shuffle error:', text));
+      }
+    });
+    console.log('Ready with Device ID', device_id);
     fetch('https://api.spotify.com/v1/me/player', {
       method: 'PUT',
       headers: {
