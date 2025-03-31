@@ -1,6 +1,5 @@
-// =====================
-// 1. OAuth and Token Setup
-// =====================
+// script.js
+
 (function () {
   const client_id = 'cde3eaa90edd4d8893a89046e3056912';
   const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
@@ -21,9 +20,7 @@
   }
 
   let token = localStorage.getItem('spotify_access_token');
-  if (!token) {
-    token = getAccessTokenFromUrl();
-  }
+  if (!token) token = getAccessTokenFromUrl();
   if (!token) {
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=token&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=${encodeURIComponent(scopes)}`;
     window.location.replace(authUrl);
@@ -32,142 +29,87 @@
   }
 })();
 
-// =====================
-// 2. Spotify Web Playback SDK Integration
-// =====================
+let currentDeviceId = null;
+let isShuffling = false;
+let isPaused = false;
+let player;
+
 window.onSpotifyWebPlaybackSDKReady = () => {
   const token = localStorage.getItem('spotify_access_token');
-  if (!token) {
-    console.error('Spotify access token not found');
-    return;
-  }
+  if (!token) return console.error('Spotify access token not found');
 
-  const player = new Spotify.Player({
+  player = new Spotify.Player({
     name: 'IT Waiting Room Player',
-    getOAuthToken: cb => { cb(token); },
+    getOAuthToken: cb => cb(token),
     volume: 0.5
   });
 
-  // Error Handling
-  player.addListener('initialization_error', ({ message }) => { console.error(message); });
-  player.addListener('authentication_error', ({ message }) => { console.error(message); });
-  player.addListener('account_error', ({ message }) => { console.error(message); });
-  player.addListener('playback_error', ({ message }) => { console.error(message); });
-
-  // Playback Status Updates
-  player.addListener('player_state_changed', state => {
-    console.log('Player state changed:', state);
-  });
-
-  // When the player is ready, transfer playback and start shuffle + play
   player.addListener('ready', ({ device_id }) => {
+    currentDeviceId = device_id;
     console.log('Ready with Device ID', device_id);
 
-    // Transfer playback to this device
     fetch('https://api.spotify.com/v1/me/player', {
       method: 'PUT',
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        device_ids: [device_id],
-        play: false
-      })
-    }).then(() => {
-      console.log('Playback transferred to Web SDK');
+      body: JSON.stringify({ device_ids: [device_id], play: true })
+    });
+  });
 
-      // Enable Shuffle
-      return fetch(`https://api.spotify.com/v1/me/player/shuffle?state=true&device_id=${device_id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      });
-    }).then(() => {
-      console.log('Shuffle enabled');
+  player.addListener('player_state_changed', state => {
+    if (!state) return;
+    const currentTrack = state.track_window.current_track;
+    document.getElementById('trackName').textContent = currentTrack.name;
+    document.getElementById('artistName').textContent = currentTrack.artists.map(artist => artist.name).join(', ');
+    document.getElementById('albumArt').src = currentTrack.album.images[0].url;
 
-      // Wait a moment before playing
-      return new Promise(resolve => setTimeout(resolve, 1000));
-    }).then(() => {
-      // Start playback
-      return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
-          offset: { position: 0 },
-          position_ms: 0
-        })
-      });
-    }).then(res => {
-      if (res.ok) {
-        console.log('Playback started with shuffle!');
-      } else {
-        return res.text().then(text => console.error('Playback error:', text));
-      }
-    }).catch(err => console.error('Setup error:', err));
+    isPaused = state.paused;
+    document.getElementById('playPauseButton').textContent = isPaused ? 'Play' : 'Pause';
   });
 
   player.connect();
 };
 
-// =====================
-// 3. Optional: Particle Background
-// =====================
-class Particle {
-  constructor() {
-    this.reset();
-  }
-  reset() {
-    this.x = Math.random() * width;
-    this.y = Math.random() * height;
-    this.size = Math.random() * 3 + 1;
-    this.speedX = (Math.random() - 0.5) * 1.5;
-    this.speedY = (Math.random() - 0.5) * 1.5;
-    this.opacity = Math.random() * 0.5 + 0.5;
-  }
-  update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-    if (this.x > width) this.x = 0;
-    if (this.x < 0) this.x = width;
-    if (this.y > height) this.y = 0;
-    if (this.y < 0) this.y = height;
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-    ctx.fill();
-  }
-}
+// Button & Volume Handlers
+document.addEventListener('DOMContentLoaded', () => {
+  const shuffleBtn = document.getElementById('shuffleButton');
+  const playPauseBtn = document.getElementById('playPauseButton');
+  const volumeSlider = document.getElementById('volumeControl');
 
-let particles = [];
-const particleCount = 150;
-
-function initParticles() {
-  particles = [];
-  for (let i = 0; i < particleCount; i++) {
-    particles.push(new Particle());
-  }
-}
-
-function animate() {
-  let gradient = ctx.createLinearGradient(0, 0, width, height);
-  gradient.addColorStop(0, '#1e3c72');
-  gradient.addColorStop(1, '#2a5298');
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, width, height);
-  particles.forEach(particle => {
-    particle.update();
-    particle.draw();
+  shuffleBtn.addEventListener('click', () => {
+    const token = localStorage.getItem('spotify_access_token');
+    if (!token || !currentDeviceId) return;
+    isShuffling = !isShuffling;
+    fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${isShuffling}&device_id=${currentDeviceId}`, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(() => {
+      shuffleBtn.textContent = isShuffling ? 'Disable Shuffle' : 'Enable Shuffle';
+    });
   });
-  requestAnimationFrame(animate);
-}
 
-initParticles();
-animate();
+  playPauseBtn.addEventListener('click', () => {
+    const token = localStorage.getItem('spotify_access_token');
+    if (!token) return;
+    if (isPaused) {
+      fetch('https://api.spotify.com/v1/me/player/play', {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+    } else {
+      fetch('https://api.spotify.com/v1/me/player/pause', {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+    }
+  });
+
+  volumeSlider.addEventListener('input', (e) => {
+    const volume = parseInt(e.target.value) / 100;
+    if (player) {
+      player.setVolume(volume).then(() => console.log('Volume set to', volume));
+    }
+  });
+});
