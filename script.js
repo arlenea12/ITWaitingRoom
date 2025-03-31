@@ -1,12 +1,11 @@
 // =====================
 // 1. OAuth and Token Setup
 // =====================
-(function() {
+(function () {
   const client_id = 'cde3eaa90edd4d8893a89046e3056912';
   const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
   const scopes = 'user-modify-playback-state user-read-playback-state';
 
-  // Check the URL hash for an access token and store it in localStorage
   function getAccessTokenFromUrl() {
     const hash = window.location.hash;
     if (hash) {
@@ -36,7 +35,6 @@
 // =====================
 // 2. Spotify Web Playback SDK Integration
 // =====================
-
 window.onSpotifyWebPlaybackSDKReady = () => {
   const token = localStorage.getItem('spotify_access_token');
   if (!token) {
@@ -57,45 +55,69 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   player.addListener('playback_error', ({ message }) => { console.error(message); });
 
   // Playback Status Updates
-  player.addListener('player_state_changed', state => { 
-    console.log('Player state changed:', state); 
+  player.addListener('player_state_changed', state => {
+    console.log('Player state changed:', state);
   });
 
-  // When the player is ready, transfer playback to it
+  // When the player is ready, transfer playback and start shuffle + play
   player.addListener('ready', ({ device_id }) => {
-  console.log('Ready with Device ID', device_id);
+    console.log('Ready with Device ID', device_id);
 
-  // 1. Enable Shuffle
-  fetch(`https://api.spotify.com/v1/me/player/shuffle?state=true`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': 'Bearer ' + token
-    }
-  }).then(() => {
-    console.log('Shuffle request sent');
-
-    // 2. Start playback of the playlist after shuffle is enabled
-    return fetch('https://api.spotify.com/v1/me/player/play', {
+    // Transfer playback to this device
+    fetch('https://api.spotify.com/v1/me/player', {
       method: 'PUT',
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
-        offset: { position: 0 },
-        position_ms: 0
+        device_ids: [device_id],
+        play: false
       })
-    });
-  }).then(res => {
-    if (res.ok) {
-      console.log('Playback started with shuffle!');
-    } else {
-      res.text().then(text => console.error('Playback error:', text));
-    }
-  }).catch(err => console.error('Setup error:', err));
-});
+    }).then(() => {
+      console.log('Playback transferred to Web SDK');
 
+      // Enable Shuffle
+      return fetch(`https://api.spotify.com/v1/me/player/shuffle?state=true&device_id=${device_id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      });
+    }).then(() => {
+      console.log('Shuffle enabled');
+
+      // Wait a moment before playing
+      return new Promise(resolve => setTimeout(resolve, 1000));
+    }).then(() => {
+      // Start playback
+      return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
+          offset: { position: 0 },
+          position_ms: 0
+        })
+      });
+    }).then(res => {
+      if (res.ok) {
+        console.log('Playback started with shuffle!');
+      } else {
+        return res.text().then(text => console.error('Playback error:', text));
+      }
+    }).catch(err => console.error('Setup error:', err));
+  });
+
+  player.connect();
+};
+
+// =====================
+// 3. Optional: Particle Background
+// =====================
 class Particle {
   constructor() {
     this.reset();
