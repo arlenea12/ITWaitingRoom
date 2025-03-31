@@ -48,6 +48,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     currentDeviceId = device_id;
     console.log('Ready with Device ID', device_id);
 
+    // Playback transfer only (no autoplay)
     fetch('https://api.spotify.com/v1/me/player', {
       method: 'PUT',
       headers: {
@@ -57,29 +58,9 @@ window.onSpotifyWebPlaybackSDKReady = () => {
       body: JSON.stringify({ device_ids: [device_id], play: false })
     })
       .then(() => {
-        console.log('Transferred playback to Web SDK');
-
-        return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
-            offset: { position: 0 },
-            position_ms: 0
-          })
-        });
+        console.log('Playback transferred to Web SDK');
       })
-      .then(res => {
-        if (res.ok) {
-          console.log('Playback started!');
-        } else {
-          return res.text().then(text => console.error('Playback error:', text));
-        }
-      })
-      .catch(err => console.error('Playback setup error:', err));
+      .catch(err => console.error('Playback transfer error:', err));
   });
 
   player.addListener('player_state_changed', state => {
@@ -132,11 +113,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   playPauseBtn.addEventListener('click', () => {
     const token = localStorage.getItem('spotify_access_token');
-    if (!token) return;
+    if (!token || !currentDeviceId) return;
+
     if (isPaused) {
-      fetch('https://api.spotify.com/v1/me/player/play', {
+      fetch(`https://api.spotify.com/v1/me/player/play?device_id=${currentDeviceId}`, {
         method: 'PUT',
-        headers: { 'Authorization': 'Bearer ' + token }
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
+          offset: { position: 0 },
+          position_ms: 0
+        })
       });
     } else {
       fetch('https://api.spotify.com/v1/me/player/pause', {
