@@ -1,3 +1,5 @@
+// script.js
+
 (function () {
   const client_id = 'cde3eaa90edd4d8893a89046e3056912';
   const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
@@ -52,8 +54,32 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ device_ids: [device_id], play: true })
-    });
+      body: JSON.stringify({ device_ids: [device_id], play: false })
+    })
+      .then(() => {
+        console.log('Transferred playback to Web SDK');
+
+        return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
+            offset: { position: 0 },
+            position_ms: 0
+          })
+        });
+      })
+      .then(res => {
+        if (res.ok) {
+          console.log('Playback started!');
+        } else {
+          return res.text().then(text => console.error('Playback error:', text));
+        }
+      })
+      .catch(err => console.error('Playback setup error:', err));
   });
 
   player.addListener('player_state_changed', state => {
