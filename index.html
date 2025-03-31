@@ -1,48 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IT Department Waiting Room</title>
-  
-  <!-- Link to External CSS -->
-  <link rel="stylesheet" href="styles.css">
-  
-  <!-- Load Spotify Web Playback SDK -->
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Spotify SDK -->
   <script src="https://sdk.scdn.co/spotify-player.js"></script>
 </head>
 <body>
-  <!-- Fullscreen Canvas Background -->
+  <!-- Background Canvas -->
   <canvas id="background-canvas"></canvas>
-  
-  <!-- Main Content -->
+
+  <!-- Main Container -->
   <div class="container">
     <header>
       <h1>Welcome to the IT Department</h1>
       <p>Enjoy the music and meet our team while you wait!</p>
     </header>
-    
-    <!-- Team Introduction Section -->
+
+    <!-- Navigation Buttons -->
+    <div class="custom-nav">
+      <button onclick="document.getElementById('team').scrollIntoView({behavior: 'smooth'})">Team</button>
+      <button onclick="document.getElementById('spotify').scrollIntoView({behavior: 'smooth'})">Spotify</button>
+      <button onclick="window.location.href='https://example.com';">External Link</button>
+    </div>
+
+    <!-- Team Section -->
     <section class="team-section" id="team">
       <h2>Meet the Team</h2>
-
-      <!-- Custom Navigation Buttons -->
-      <div class="custom-nav">
-        <button onclick="document.getElementById('team').scrollIntoView({behavior: 'smooth'});">Team</button>
-        <button onclick="document.getElementById('spotify').scrollIntoView({behavior: 'smooth'});">Spotify</button>
-        <button onclick="window.location.href='https://example.com';">External Link</button>
-      </div>
-
       <div class="team">
         <div class="team-member">
-          <img src="Photos/buttercup.jpg" alt="Arlene Alvarado">
+          <img src="Photos/buttercup.jpg" alt="Arlene Alvarado" />
           <div class="info">
             <h3>Arlene Alvarado</h3>
             <p>Bot</p>
           </div>
         </div>
         <div class="team-member">
-          <img src="https://via.placeholder.com/280x200" alt="Team Member 2">
+          <img src="https://via.placeholder.com/280x200" alt="Seth McCullar" />
           <div class="info">
             <h3>Seth McCullar</h3>
             <p>System Administrator</p>
@@ -50,23 +49,26 @@
         </div>
       </div>
     </section>
-    
-    <!-- Spotify Playlist Section -->
+
+    <!-- Live Spotify Player -->
     <section class="spotify" id="spotify">
-      <h2>Our Spotify Playlist</h2>
-      <!-- Adjusted height for the embedded Spotify player -->
-      <iframe style="border-radius:12px" 
-              src="https://open.spotify.com/embed/playlist/0sXmN2Mjk4xmgeaABkSGAk?utm_source=generator" 
-              width="100%" height="400" 
-              frameborder="0" 
-              allowfullscreen="" 
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-              loading="lazy">
-      </iframe>
+      <h2>Now Playing</h2>
+      <div class="player-ui">
+        <img id="albumArt" src="" alt="Album Art" width="220" />
+        <h2 id="trackName">Track Name</h2>
+        <h4 id="artistName">Artist Name</h4>
+
+        <div class="controls">
+          <button id="shuffleButton">Enable Shuffle</button>
+          <button id="playPauseButton">Pause</button>
+          <label for="volumeControl">Volume:</label>
+          <input type="range" id="volumeControl" min="0" max="100" value="50" />
+        </div>
+      </div>
     </section>
   </div>
-  
-  <!-- External JavaScript for OAuth, Spotify Integration, and Background Effects -->
+
+  <!-- Your JS Code -->
   <script src="script.js"></script>
 </body>
 </html>
