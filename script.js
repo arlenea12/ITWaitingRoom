@@ -216,49 +216,6 @@ player.addListener('player_state_changed', state => {
       });
 
       
-      document.addEventListener('DOMContentLoaded', () => {
-        const shuffleBtn = document.getElementById('shuffleButton');
-        const playPauseBtn = document.getElementById('playPauseButton');
-        const volumeSlider = document.getElementById('volumeControl');
-
-        const nextBtn = document.createElement('button');
-        nextBtn.id = 'nextButton';
-        nextBtn.textContent = 'Next';
-        playPauseBtn.insertAdjacentElement('afterend', nextBtn);
-
-        const prevBtn = document.createElement('button');
-        prevBtn.id = 'prevButton';
-        prevBtn.textContent = 'Previous';
-        shuffleBtn.insertAdjacentElement('beforebegin', prevBtn);
-
-        const repeatBtn = document.createElement('button');
-        repeatBtn.id = 'repeatButton';
-        repeatBtn.textContent = 'Repeat Off';
-        volumeSlider.parentElement.appendChild(repeatBtn);
-
-        const progressContainer = document.createElement('div');
-        progressContainer.style.marginTop = '10px';
-        const progress = document.createElement('input');
-        progress.type = 'range';
-        progress.min = 0;
-        progress.max = 100;
-        progress.value = 0;
-        progress.id = 'progressBar';
-        progress.style.width = '100%';
-        progressContainer.appendChild(progress);
-        document.querySelector('.player-ui').appendChild(progressContainer);
-
-        const connectButton = document.createElement('button');
-        connectButton.textContent = 'Connect Player';
-        connectButton.style.marginTop = '20px';
-        connectButton.onclick = () => {
-          player.connect().then(success => {
-            if (success) {
-              console.log('Player connected!');
-            } else {
-              console.error('Player failed to connect');
-            }
-          });
         };
         document.querySelector('.player-ui').appendChild(connectButton);
 
