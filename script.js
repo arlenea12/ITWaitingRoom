@@ -1,42 +1,36 @@
 // =======================
 // Spotify Web Player Script
 // =======================
-
 (function () {
-  // Spotify API client ID (used to identify your app)
-  const client_id = 'cde3eaa90edd4d8893a89046e3056912'; // Your Spotify Client ID
-  const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/'; // Your Redirect URI
-  const scopes = 'streaming user-modify-playback-state user-read-playback-state user-read-currently-playing'; // The scopes your app requires
+  const client_id = 'cde3eaa90edd4d8893a89046e3056912';
+  const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
+  const scopes = 'streaming user-modify-playback-state user-read-playback-state user-read-currently-playing';
 
-  // Function to extract the access token from the URL after user authorization
   function getAccessTokenFromUrl() {
-    const hash = window.location.hash; // Get the URL hash (contains the access token)
+    const hash = window.location.hash;
     if (hash) {
-      const urlParams = new URLSearchParams(hash.substring(1)); // Parse the URL hash
-      const token = urlParams.get('access_token'); // Extract the access token from the URL
+      const urlParams = new URLSearchParams(hash.substring(1));
+      const token = urlParams.get('access_token');
       if (token) {
-        localStorage.setItem('spotify_access_token', token); // Store the token in localStorage for future use
+        localStorage.setItem('spotify_access_token', token);
       }
-      window.location.hash = ''; // Clean up the URL by removing the hash
+      window.location.hash = '';
       return token;
     }
-    return null; // Return null if no access token is found
+    return null;
   }
 
-  // Try to retrieve the token from localStorage first, otherwise extract it from the URL
   let token = localStorage.getItem('spotify_access_token');
-  if (!token) token = getAccessTokenFromUrl(); // Get token if not already in localStorage
+  if (!token) token = getAccessTokenFromUrl();
 
-  // If no token is found, redirect to Spotify authorization page to get a new one
   if (!token) {
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=token&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=${encodeURIComponent(scopes)}`;
-    window.location.replace(authUrl); // Redirect user to the Spotify authorization URL
+    window.location.replace(authUrl);
   } else {
     console.log('Spotify access token found:', token);
-    initPlayer(token); // Call the function to initialize the player
+    initPlayer(token);
   }
 
-  // Function to initialize the Spotify player
   function initPlayer(token) {
     let currentDeviceId = null;
     let isShuffling = false;
@@ -104,7 +98,7 @@
       const prevBtn = document.getElementById('prevBtn');
       const repeatBtn = document.getElementById('repeatBtn');
 
-      shuffleButton.addEventListener('click', () => {
+      shuffleButton?.addEventListener('click', () => {
         isShuffling = !isShuffling;
         shuffleButton.textContent = isShuffling ? 'Disable Shuffle' : 'Enable Shuffle';
 
@@ -115,7 +109,7 @@
         .then(() => console.log('Shuffle ' + (isShuffling ? 'enabled' : 'disabled')));
       });
 
-      playPauseButton.addEventListener('click', () => {
+      playPauseButton?.addEventListener('click', () => {
         if (isPaused) {
           player.resume().then(() => {
             playPauseButton.textContent = 'Pause';
@@ -131,20 +125,20 @@
         }
       });
 
-      volumeSlider.addEventListener('input', (e) => {
+      volumeSlider?.addEventListener('input', (e) => {
         const volume = parseInt(e.target.value) / 100;
         player.setVolume(volume).then(() => console.log('Volume set to', volume));
       });
 
-      nextBtn.addEventListener('click', () => {
+      nextBtn?.addEventListener('click', () => {
         player.nextTrack().then(() => console.log('Next track'));
       });
 
-      prevBtn.addEventListener('click', () => {
+      prevBtn?.addEventListener('click', () => {
         player.previousTrack().then(() => console.log('Previous track'));
       });
 
-      repeatBtn.addEventListener('click', () => {
+      repeatBtn?.addEventListener('click', () => {
         if (repeatState === 'off') repeatState = 'context';
         else if (repeatState === 'context') repeatState = 'track';
         else repeatState = 'off';
@@ -157,7 +151,6 @@
         });
       });
 
-      // Fetch track info and update UI
       function updateTrackInfo(data) {
         if (!data || !data.item) {
           console.log('No track is currently playing.');
@@ -166,17 +159,25 @@
 
         const trackName = data.item.name;
         const artistName = data.item.artists.map(artist => artist.name).join(', ');
-        const albumArtUrl = data.item.album.images[0]?.url || 'https://via.placeholder.com/280x200'; // Default placeholder if no album art
+        const albumArtUrl = data.item.album.images[0]?.url || 'https://via.placeholder.com/280x200';
 
-        document.getElementById('trackName').textContent = trackName;
-        document.getElementById('artistName').textContent = artistName;
-        document.getElementById('albumArt').src = albumArtUrl;
+        document.getElementById('trackName')?.textContent = trackName;
+        document.getElementById('artistName')?.textContent = artistName;
+        document.getElementById('albumArt')?.src = albumArtUrl;
       }
 
       player.addListener('player_state_changed', (state) => {
         console.log('Player state changed:', state);
-        if (state.track_window) {
-          updateTrackInfo(state.track_window.current_track);
+        if (state?.track_window?.current_track) {
+          const currentTrack = state.track_window.current_track;
+          const formatted = {
+            item: {
+              name: currentTrack.name,
+              artists: currentTrack.artists,
+              album: currentTrack.album
+            }
+          };
+          updateTrackInfo(formatted);
         }
       });
 
@@ -186,7 +187,7 @@
       .then(res => res.json())
       .then(data => {
         if (data && data.item) {
-          updateTrackInfo(data.item);
+          updateTrackInfo(data);
         } else {
           console.log('No track is currently playing.');
         }
@@ -197,5 +198,3 @@
     };
   }
 })();
-
-
