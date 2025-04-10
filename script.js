@@ -161,9 +161,9 @@
         const artistName = data.item.artists.map(artist => artist.name).join(', ');
         const albumArtUrl = data.item.album.images[0]?.url || 'https://via.placeholder.com/280x200';
 
-        document.getElementById('trackName')?.textContent = trackName;
-        document.getElementById('artistName')?.textContent = artistName;
-        document.getElementById('albumArt')?.src = albumArtUrl;
+        document.getElementById('trackName').textContent = trackName;
+        document.getElementById('artistName').textContent = artistName;
+        document.getElementById('albumArt').src = albumArtUrl;
       }
 
       player.addListener('player_state_changed', (state) => {
