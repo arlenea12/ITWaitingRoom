@@ -46,41 +46,67 @@
       });
 
       player.addListener('ready', ({ device_id }) => {
-        currentDeviceId = device_id;
-        console.log('Ready with Device ID', device_id);
+  currentDeviceId = device_id;
+  console.log('Ready with Device ID', device_id);
 
-        // Transfer playback to this device
-        fetch('https://api.spotify.com/v1/me/player', {
-          method: 'PUT',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ device_ids: [device_id], play: true })
-        })
-        .then(() => {
-          const playlistUri = 'spotify:playlist:37i9dQZF1DXcBWIGoYBM5M'; // Public playlist
-          const randomTrack = Math.floor(Math.random() * 50); // Use 50 for public playlists
+  // Transfer playback to this device
+  fetch('https://api.spotify.com/v1/me/player', {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ device_ids: [device_id], play: true })
+  })
+  .then(() => {
+    const playlistId = '37i9dQZF1DXcBWIGoYBM5M'; // Public playlist
+    const playlistApiUrl = `https://api.spotify.com/v1/playlists/${playlistId}`;
 
-          // Wait a moment before sending play request
-          setTimeout(() => {
-            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
-              method: 'PUT',
-              headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                context_uri: playlistUri,
-                offset: { position: randomTrack },
-                position_ms: 0
-              })
-            })
-            .then(() => console.log('✅ Playback started!'))
-            .catch(err => console.error('❌ Playback failed:', err));
-          }, 1000);
-        });
+    // Step 1: Get total track count
+    fetch(playlistApiUrl, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(res => res.json())
+    .then(data => {
+      const totalTracks = data.tracks.total;
+      const randomIndex = Math.floor(Math.random() * totalTracks);
+      console.log(`🎲 Random track index: ${randomIndex} of ${totalTracks}`);
+
+      // Step 2: Fetch just that track
+      const trackUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=${randomIndex}&limit=1`;
+
+      return fetch(trackUrl, {
+        headers: { 'Authorization': 'Bearer ' + token }
       });
+    })
+    .then(res => res.json())
+    .then(trackData => {
+      const trackUri = trackData.items[0]?.track?.uri;
+      if (!trackUri) throw new Error('Track URI not found');
+
+      // Step 3: Start playback directly with that track
+      return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uris: [trackUri],
+          position_ms: 0
+        })
+      });
+    })
+    .then(() => {
+      console.log('✅ Playback started from a random track');
+    })
+    .catch(err => {
+      console.error('❌ Playback setup failed:', err);
+      localStorage.removeItem('spotify_access_token');
+    });
+  });
+});
+
 
       player.connect();
 
