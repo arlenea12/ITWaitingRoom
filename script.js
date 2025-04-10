@@ -175,37 +175,42 @@
       });
 
       // Fetch track info and update UI
-      function updateTrackInfo() {
-        fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.item) {
-            const trackName = data.item.name; // Get track name
-            const artistName = data.item.artists.map(artist => artist.name).join(', '); // Get artist(s) name(s)
-            const albumArtUrl = data.item.album.images[0].url; // Get album artwork URL
+      function updateTrackInfo(data) {
+        const trackName = data.item.name; // Get track name
+        const artistName = data.item.artists.map(artist => artist.name).join(', '); // Get artist(s) name(s)
+        const albumArtUrl = data.item.album.images[0].url; // Get album artwork URL
 
-            // Update the UI with track info
-            document.getElementById('trackName').textContent = trackName;
-            document.getElementById('artistName').textContent = artistName;
-            document.getElementById('albumArt').src = albumArtUrl;
-          } else {
-            console.log('No track is currently playing.'); // If no track is playing, log this message
-          }
-        })
-        .catch(err => {
-          console.error('Error fetching track info:', err); // Catch any errors
-        });
+        // Update the UI with track info
+        document.getElementById('trackName').textContent = trackName;
+        document.getElementById('artistName').textContent = artistName;
+        document.getElementById('albumArt').src = albumArtUrl;
       }
 
-      // Update track info when the player is ready
-      updateTrackInfo();
+      // Listen for changes to the track and update the track info in real-time
+      player.addListener('player_state_changed', (state) => {
+        console.log('Player state changed:', state);
+        if (state.track_window) {
+          updateTrackInfo(state.track_window.current_track);
+        }
+      });
 
-      // Optionally, update track info every few seconds (to handle changes in track)
-      setInterval(updateTrackInfo, 5000); // Update every 5 seconds
+      // Fetch initial track info when the player is ready
+      fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.item) {
+          updateTrackInfo(data.item); // Update track info if there's a track playing
+        } else {
+          console.log('No track is currently playing.'); // Log if no track is playing
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching track info:', err); // Catch any errors
+      });
     };
   }
 })();
