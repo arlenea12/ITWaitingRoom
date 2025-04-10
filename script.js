@@ -2,7 +2,7 @@
 (function () {
   const client_id = 'cde3eaa90edd4d8893a89046e3056912';
   const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
-  const scopes = 'user-modify-playback-state user-read-playback-state user-read-currently-playing';
+  const scopes = 'streaming user-read-playback-state user-modify-playback-state user-read-currently-playing';
 
   function getAccessTokenFromUrl() {
     const hash = window.location.hash;
