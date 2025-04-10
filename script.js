@@ -1,6 +1,3 @@
-// =======================
-// Spotify Web Player Script
-// =======================
 (function () {
   const client_id = 'cde3eaa90edd4d8893a89046e3056912';
   const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
@@ -170,6 +167,39 @@
           console.log('Seeked to position', newPosition);
         });
       });
+      
+      // Fetch track info and update UI
+      function updateTrackInfo() {
+        fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.item) {
+            const trackName = data.item.name;
+            const artistName = data.item.artists.map(artist => artist.name).join(', ');
+            const albumArtUrl = data.item.album.images[0].url;
+
+            // Update the UI with track info
+            document.getElementById('trackName').textContent = trackName;
+            document.getElementById('artistName').textContent = artistName;
+            document.getElementById('albumArt').src = albumArtUrl;
+          } else {
+            console.log('No track is currently playing.');
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching track info:', err);
+        });
+      }
+
+      // Update track info when the player is ready
+      updateTrackInfo();
+
+      // Optionally, update track info every few seconds
+      setInterval(updateTrackInfo, 5000); // Updates track info every 5 seconds
     };
   }
 })();
