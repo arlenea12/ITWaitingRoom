@@ -1,4 +1,3 @@
-
 // =======================
 // Spotify Web Player Script
 // =======================
@@ -60,79 +59,117 @@
           body: JSON.stringify({ device_ids: [device_id], play: false })
         })
         .then(() => {
-          
-        // Dynamically get playlist length and start on a random track
-        fetch('https://api.spotify.com/v1/playlists/0sXmN2Mjk4xmgeaABkSGAk', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        })
-        .then(res => res.json())
-        .then(data => {
-          const totalTracks = data.tracks.total;
-          const randomTrack = Math.floor(Math.random() * totalTracks);
-          console.log(`🎲 Starting at random track: ${randomTrack} of ${totalTracks}`);
-
-          return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
-            method: 'PUT',
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
-              offset: { position: randomTrack },
-              position_ms: 0
-            })
-          });
-        })
-        .then(() => console.log('Playback started!'))
-        .catch(err => {
-          console.error('Playback setup failed:', err);
-          localStorage.removeItem('spotify_access_token');
-        });
-;
-          } else {
-            fetch('https://api.spotify.com/v1/me/player/pause', {
-              method: 'PUT',
-              headers: { 'Authorization': 'Bearer ' + token }
-            }).then(() => console.log("Playback paused"));
-          }
-        });
-
-        volumeSlider.addEventListener('input', (e) => {
-          const volume = parseInt(e.target.value) / 100;
-          player.setVolume(volume).then(() => console.log('Volume set to', volume));
-        });
-
-        nextBtn.addEventListener('click', () => {
-          player.nextTrack().then(() => console.log('Next track'));
-        });
-
-        prevBtn.addEventListener('click', () => {
-          player.previousTrack().then(() => console.log('Previous track'));
-        });
-
-        repeatBtn.addEventListener('click', () => {
-          if (repeatState === 'off') repeatState = 'context';
-          else if (repeatState === 'context') repeatState = 'track';
-          else repeatState = 'off';
-
-          fetch('https://api.spotify.com/v1/me/player/repeat?state=' + repeatState + '&device_id=' + currentDeviceId, {
-            method: 'PUT',
+          // Dynamically get playlist length and start on a random track
+          fetch('https://api.spotify.com/v1/playlists/0sXmN2Mjk4xmgeaABkSGAk', {
             headers: { 'Authorization': 'Bearer ' + token }
-          }).then(() => {
-            repeatBtn.textContent = 'Repeat ' + (repeatState === 'off' ? 'Off' : repeatState.charAt(0).toUpperCase() + repeatState.slice(1));
-          });
-        });
+          })
+          .then(res => res.json())
+          .then(data => {
+            const totalTracks = data.tracks.total;
+            const randomTrack = Math.floor(Math.random() * totalTracks);
+            console.log(`🎲 Starting at random track: ${randomTrack} of ${totalTracks}`);
 
-        progress.addEventListener('input', (e) => {
-          const newPosition = (e.target.value / 100) * player._options.duration;
-          player.seek(newPosition).then(() => {
-            console.log('Seeked to position', newPosition);
+            return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+              method: 'PUT',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
+                offset: { position: randomTrack },
+                position_ms: 0
+              })
+            });
+          })
+          .then(() => console.log('Playback started!'))
+          .catch(err => {
+            console.error('Playback setup failed:', err);
+            localStorage.removeItem('spotify_access_token');
           });
         });
       });
 
+      // Connect the player
       player.connect();
+
+      // Control Buttons
+      const shuffleButton = document.getElementById('shuffleButton');
+      const playPauseButton = document.getElementById('playPauseButton');
+      const volumeSlider = document.getElementById('volumeControl');
+      const nextBtn = document.getElementById('nextBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const repeatBtn = document.getElementById('repeatBtn');
+      const progress = document.getElementById('progress');
+
+      // Shuffle functionality
+      shuffleButton.addEventListener('click', () => {
+        isShuffling = !isShuffling;
+        shuffleButton.textContent = isShuffling ? 'Disable Shuffle' : 'Enable Shuffle';
+
+        fetch('https://api.spotify.com/v1/me/player/shuffle?state=' + isShuffling, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        })
+        .then(() => console.log('Shuffle ' + (isShuffling ? 'enabled' : 'disabled')));
+      });
+
+      // Play/Pause functionality
+      playPauseButton.addEventListener('click', () => {
+        if (isPaused) {
+          player.resume().then(() => {
+            playPauseButton.textContent = 'Pause';
+            console.log('Playback resumed');
+            isPaused = false;
+          });
+        } else {
+          player.pause().then(() => {
+            playPauseButton.textContent = 'Play';
+            console.log('Playback paused');
+            isPaused = true;
+          });
+        }
+      });
+
+      // Volume control functionality
+      volumeSlider.addEventListener('input', (e) => {
+        const volume = parseInt(e.target.value) / 100;
+        player.setVolume(volume).then(() => console.log('Volume set to', volume));
+      });
+
+      // Next Track functionality
+      nextBtn.addEventListener('click', () => {
+        player.nextTrack().then(() => console.log('Next track'));
+      });
+
+      // Previous Track functionality
+      prevBtn.addEventListener('click', () => {
+        player.previousTrack().then(() => console.log('Previous track'));
+      });
+
+      // Repeat functionality
+      repeatBtn.addEventListener('click', () => {
+        if (repeatState === 'off') repeatState = 'context';
+        else if (repeatState === 'context') repeatState = 'track';
+        else repeatState = 'off';
+
+        fetch('https://api.spotify.com/v1/me/player/repeat?state=' + repeatState + '&device_id=' + currentDeviceId, {
+          method: 'PUT',
+          headers: { 'Authorization': 'Bearer ' + token }
+        }).then(() => {
+          repeatBtn.textContent = 'Repeat ' + (repeatState === 'off' ? 'Off' : repeatState.charAt(0).toUpperCase() + repeatState.slice(1));
+        });
+      });
+
+      // Progress Bar functionality
+      progress.addEventListener('input', (e) => {
+        const newPosition = (e.target.value / 100) * player._options.duration;
+        player.seek(newPosition).then(() => {
+          console.log('Seeked to position', newPosition);
+        });
+      });
     };
   }
 })();
