@@ -49,48 +49,42 @@
         currentDeviceId = device_id;
         console.log('Ready with Device ID', device_id);
 
+        // Transfer playback to this device
         fetch('https://api.spotify.com/v1/me/player', {
           method: 'PUT',
           headers: {
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ device_ids: [device_id], play: false })
+          body: JSON.stringify({ device_ids: [device_id], play: true })
         })
         .then(() => {
-          fetch('https://api.spotify.com/v1/playlists/0sXmN2Mjk4xmgeaABkSGAk', {
-            headers: { 'Authorization': 'Bearer ' + token }
-          })
-          .then(res => res.json())
-          .then(data => {
-            const totalTracks = data.tracks.total;
-            const randomTrack = Math.floor(Math.random() * totalTracks);
-            console.log(`🎲 Starting at random track: ${randomTrack} of ${totalTracks}`);
+          const playlistUri = 'spotify:playlist:37i9dQZF1DXcBWIGoYBM5M'; // Public playlist
+          const randomTrack = Math.floor(Math.random() * 50); // Use 50 for public playlists
 
-            return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+          // Wait a moment before sending play request
+          setTimeout(() => {
+            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
               method: 'PUT',
               headers: {
                 'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
+                context_uri: playlistUri,
                 offset: { position: randomTrack },
                 position_ms: 0
               })
-            });
-          })
-          .then(() => console.log('Playback started!'))
-          .catch(err => {
-            console.error('Playback setup failed:', err);
-            localStorage.removeItem('spotify_access_token');
-          });
+            })
+            .then(() => console.log('✅ Playback started!'))
+            .catch(err => console.error('❌ Playback failed:', err));
+          }, 1000);
         });
       });
 
       player.connect();
 
-      // Control Buttons
+      // UI Controls
       const shuffleButton = document.getElementById('shuffleButton');
       const playPauseButton = document.getElementById('playPauseButton');
       const volumeSlider = document.getElementById('volumeControl');
@@ -102,40 +96,41 @@
         isShuffling = !isShuffling;
         shuffleButton.textContent = isShuffling ? 'Disable Shuffle' : 'Enable Shuffle';
 
-        fetch('https://api.spotify.com/v1/me/player/shuffle?state=' + isShuffling, {
+        fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${isShuffling}`, {
           method: 'PUT',
           headers: { 'Authorization': 'Bearer ' + token }
-        })
-        .then(() => console.log('Shuffle ' + (isShuffling ? 'enabled' : 'disabled')));
+        }).then(() => {
+          console.log('🔀 Shuffle ' + (isShuffling ? 'enabled' : 'disabled'));
+        });
       });
 
       playPauseButton?.addEventListener('click', () => {
         if (isPaused) {
           player.resume().then(() => {
             playPauseButton.textContent = 'Pause';
-            console.log('Playback resumed');
             isPaused = false;
+            console.log('▶️ Resumed');
           });
         } else {
           player.pause().then(() => {
             playPauseButton.textContent = 'Play';
-            console.log('Playback paused');
             isPaused = true;
+            console.log('⏸️ Paused');
           });
         }
       });
 
       volumeSlider?.addEventListener('input', (e) => {
         const volume = parseInt(e.target.value) / 100;
-        player.setVolume(volume).then(() => console.log('Volume set to', volume));
+        player.setVolume(volume).then(() => console.log('🔊 Volume set to', volume));
       });
 
       nextBtn?.addEventListener('click', () => {
-        player.nextTrack().then(() => console.log('Next track'));
+        player.nextTrack().then(() => console.log('⏭️ Next track'));
       });
 
       prevBtn?.addEventListener('click', () => {
-        player.previousTrack().then(() => console.log('Previous track'));
+        player.previousTrack().then(() => console.log('⏮️ Previous track'));
       });
 
       repeatBtn?.addEventListener('click', () => {
@@ -143,7 +138,7 @@
         else if (repeatState === 'context') repeatState = 'track';
         else repeatState = 'off';
 
-        fetch('https://api.spotify.com/v1/me/player/repeat?state=' + repeatState + '&device_id=' + currentDeviceId, {
+        fetch(`https://api.spotify.com/v1/me/player/repeat?state=${repeatState}&device_id=${currentDeviceId}`, {
           method: 'PUT',
           headers: { 'Authorization': 'Bearer ' + token }
         }).then(() => {
@@ -151,6 +146,7 @@
         });
       });
 
+      // Track Info
       function updateTrackInfo(data) {
         if (!data || !data.item) {
           console.log('No track is currently playing.');
@@ -166,8 +162,9 @@
         document.getElementById('albumArt').src = albumArtUrl;
       }
 
+      // Update when state changes
       player.addListener('player_state_changed', (state) => {
-        console.log('Player state changed:', state);
+        console.log('🎵 Player state changed:', state);
         if (state?.track_window?.current_track) {
           const currentTrack = state.track_window.current_track;
           const formatted = {
@@ -181,20 +178,19 @@
         }
       });
 
+      // Initial now playing fetch
       fetch('https://api.spotify.com/v1/me/player/currently-playing', {
         headers: { 'Authorization': 'Bearer ' + token }
       })
       .then(res => res.json())
       .then(data => {
-        if (data && data.item) {
+        if (data?.item) {
           updateTrackInfo(data);
         } else {
           console.log('No track is currently playing.');
         }
       })
-      .catch(err => {
-        console.error('Error fetching track info:', err);
-      });
+      .catch(err => console.error('Error fetching current track:', err));
     };
   }
 })();
