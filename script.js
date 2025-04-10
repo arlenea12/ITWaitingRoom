@@ -44,6 +44,7 @@
     let repeatState = 'off'; // Initial repeat state (can be 'off', 'context', or 'track')
     let player; // The Spotify Player object
 
+    // Wait for Spotify Web Playback SDK to load
     window.onSpotifyWebPlaybackSDKReady = () => {
       player = new Spotify.Player({
         name: 'IT Waiting Room Player', // Name for the player
@@ -217,3 +218,4 @@
     };
   }
 })();
+
