@@ -159,14 +159,6 @@
           repeatBtn.textContent = 'Repeat ' + (repeatState === 'off' ? 'Off' : repeatState.charAt(0).toUpperCase() + repeatState.slice(1));
         });
       });
-
-      // Progress Bar functionality
-      progress.addEventListener('input', (e) => {
-        const newPosition = (e.target.value / 100) * player._options.duration;
-        player.seek(newPosition).then(() => {
-          console.log('Seeked to position', newPosition);
-        });
-      });
       
       // Fetch track info and update UI
       function updateTrackInfo() {
