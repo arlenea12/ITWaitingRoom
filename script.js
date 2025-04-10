@@ -181,7 +181,7 @@
 
         const trackName = data.item.name; // Get track name
         const artistName = data.item.artists.map(artist => artist.name).join(', '); // Get artist(s) name(s)
-        const albumArtUrl = data.item.album.images[0].url; // Get album artwork URL
+        const albumArtUrl = data.item.album.images[0]?.url || 'https://via.placeholder.com/280x200'; // Default placeholder image if no album art
 
         // Update the UI with track info
         document.getElementById('trackName').textContent = trackName;
@@ -216,4 +216,6 @@
       });
     };
   }
+})();
+
 })();
