@@ -1,5 +1,3 @@
-// script.js
-
 (function () {
   const client_id = 'cde3eaa90edd4d8893a89046e3056912';
   const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
@@ -48,7 +46,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     currentDeviceId = device_id;
     console.log('Ready with Device ID', device_id);
 
-    // Playback transfer only (no autoplay)
+    // Transfer playback and auto-start
     fetch('https://api.spotify.com/v1/me/player', {
       method: 'PUT',
       headers: {
@@ -57,10 +55,27 @@ window.onSpotifyWebPlaybackSDKReady = () => {
       },
       body: JSON.stringify({ device_ids: [device_id], play: false })
     })
-      .then(() => {
-        console.log('Playback transferred to Web SDK');
-      })
-      .catch(err => console.error('Playback transfer error:', err));
+    .then(() => {
+      console.log('Playback transferred to Web SDK');
+
+      // Now auto-start the playlist
+      return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
+          offset: { position: 0 },
+          position_ms: 0
+        })
+      });
+    })
+    .then(() => {
+      console.log('Playlist started!');
+    })
+    .catch(err => console.error('Error setting up playback:', err));
   });
 
   player.addListener('player_state_changed', state => {
@@ -135,6 +150,76 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   });
+
+  
+  const nextBtn = document.createElement('button');
+  nextBtn.id = 'nextButton';
+  nextBtn.textContent = 'Next';
+  playPauseBtn.insertAdjacentElement('afterend', nextBtn);
+
+  const prevBtn = document.createElement('button');
+  prevBtn.id = 'prevButton';
+  prevBtn.textContent = 'Previous';
+  shuffleBtn.insertAdjacentElement('beforebegin', prevBtn);
+
+  const repeatBtn = document.createElement('button');
+  repeatBtn.id = 'repeatButton';
+  repeatBtn.textContent = 'Repeat Off';
+  volumeSlider.parentElement.appendChild(repeatBtn);
+
+  const progressContainer = document.createElement('div');
+  progressContainer.style.marginTop = '10px';
+  const progress = document.createElement('input');
+  progress.type = 'range';
+  progress.min = 0;
+  progress.max = 100;
+  progress.value = 0;
+  progress.id = 'progressBar';
+  progress.style.width = '100%';
+  progressContainer.appendChild(progress);
+  document.querySelector('.player-ui').appendChild(progressContainer);
+
+  let repeatState = 'off';
+
+  nextBtn.addEventListener('click', () => {
+    player.nextTrack().then(() => console.log('Skipped to next track'));
+  });
+
+  prevBtn.addEventListener('click', () => {
+    player.previousTrack().then(() => console.log('Went to previous track'));
+  });
+
+  repeatBtn.addEventListener('click', () => {
+    if (!token) return;
+    if (repeatState === 'off') repeatState = 'context';
+    else if (repeatState === 'context') repeatState = 'track';
+    else repeatState = 'off';
+
+    fetch('https://api.spotify.com/v1/me/player/repeat?state=' + repeatState + '&device_id=' + currentDeviceId, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(() => {
+      repeatBtn.textContent = 'Repeat ' + (repeatState === 'off' ? 'Off' : repeatState.charAt(0).toUpperCase() + repeatState.slice(1));
+    });
+  });
+
+  player.addListener('player_state_changed', state => {
+    if (!state) return;
+    const position = state.position;
+    const duration = state.duration;
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) {
+      progressBar.value = (position / duration) * 100;
+    }
+  });
+
+  document.getElementById('progressBar').addEventListener('input', (e) => {
+    const newPosition = (e.target.value / 100) * player._options.duration;
+    player.seek(newPosition).then(() => {
+      console.log('Seeked to position', newPosition);
+    });
+  });
+
 
   volumeSlider.addEventListener('input', (e) => {
     const volume = parseInt(e.target.value) / 100;
