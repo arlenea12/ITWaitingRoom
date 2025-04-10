@@ -60,6 +60,17 @@
           body: JSON.stringify({ device_ids: [device_id], play: false })
         })
         .then(() => {
+          
+        // Dynamically get playlist length and start on a random track
+        fetch('https://api.spotify.com/v1/playlists/0sXmN2Mjk4xmgeaABkSGAk', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(res => res.json())
+        .then(data => {
+          const totalTracks = data.tracks.total;
+          const randomTrack = Math.floor(Math.random() * totalTracks);
+          console.log(`🎲 Starting at random track: ${randomTrack} of ${totalTracks}`);
+
           return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
             method: 'PUT',
             headers: {
@@ -68,107 +79,17 @@
             },
             body: JSON.stringify({
               context_uri: 'spotify:playlist:0sXmN2Mjk4xmgeaABkSGAk',
-              offset: { position: 0 },
+              offset: { position: randomTrack },
               position_ms: 0
             })
           });
         })
-        .then(() => {
-          console.log('Playback started!');
-        })
+        .then(() => console.log('Playback started!'))
         .catch(err => {
           console.error('Playback setup failed:', err);
           localStorage.removeItem('spotify_access_token');
         });
-      });
-
-      player.addListener('player_state_changed', state => {
-        if (!state) return;
-        const currentTrack = state.track_window.current_track;
-
-        document.getElementById('trackName').textContent = currentTrack.name;
-        document.getElementById('artistName').textContent = currentTrack.artists.map(a => a.name).join(', ');
-        document.getElementById('albumArt').src = currentTrack.album.images[0].url;
-
-        isPaused = state.paused;
-        document.getElementById('playPauseButton').textContent = isPaused ? 'Play' : 'Pause';
-
-        const progressBar = document.getElementById('progressBar');
-        if (progressBar) {
-          progressBar.value = (state.position / state.duration) * 100;
-        }
-      });
-
-      document.addEventListener('DOMContentLoaded', () => {
-        const shuffleBtn = document.getElementById('shuffleButton');
-        const playPauseBtn = document.getElementById('playPauseButton');
-        const volumeSlider = document.getElementById('volumeControl');
-        const playerUI = document.querySelector('.player-ui');
-
-        if (!shuffleBtn || !playPauseBtn || !volumeSlider || !playerUI) {
-          console.warn("Missing base UI elements.");
-          return;
-        }
-
-        const nextBtn = document.createElement('button');
-        nextBtn.id = 'nextButton';
-        nextBtn.textContent = 'Next';
-        playPauseBtn.insertAdjacentElement('afterend', nextBtn);
-
-        const prevBtn = document.createElement('button');
-        prevBtn.id = 'prevButton';
-        prevBtn.textContent = 'Previous';
-        shuffleBtn.insertAdjacentElement('beforebegin', prevBtn);
-
-        const repeatBtn = document.createElement('button');
-        repeatBtn.id = 'repeatButton';
-        repeatBtn.textContent = 'Repeat Off';
-        volumeSlider.parentElement.appendChild(repeatBtn);
-
-        const progressContainer = document.createElement('div');
-        progressContainer.style.marginTop = '10px';
-        const progress = document.createElement('input');
-        progress.type = 'range';
-        progress.min = 0;
-        progress.max = 100;
-        progress.value = 0;
-        progress.id = 'progressBar';
-        progress.style.width = '100%';
-        progressContainer.appendChild(progress);
-        playerUI.appendChild(progressContainer);
-
-        const connectButton = document.createElement('button');
-        connectButton.textContent = 'Connect Player';
-        connectButton.style.marginTop = '20px';
-        connectButton.onclick = () => {
-          player.connect().then(success => {
-            if (success) console.log('Player connected!');
-            else console.error('Player failed to connect');
-          });
-        };
-        playerUI.appendChild(connectButton);
-
-        // Hook up listeners
-        shuffleBtn.addEventListener('click', () => {
-          isShuffling = !isShuffling;
-          fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${isShuffling}&device_id=${currentDeviceId}`, {
-            method: 'PUT',
-            headers: { 'Authorization': 'Bearer ' + token }
-          }).then(() => {
-            shuffleBtn.textContent = isShuffling ? 'Disable Shuffle' : 'Enable Shuffle';
-            console.log("Shuffle toggled:", isShuffling);
-          });
-        });
-
-        playPauseBtn.addEventListener('click', () => {
-          if (isPaused) {
-            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${currentDeviceId}`, {
-              method: 'PUT',
-              headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-              }
-            }).then(() => console.log("Playback resumed"));
+;
           } else {
             fetch('https://api.spotify.com/v1/me/player/pause', {
               method: 'PUT',
