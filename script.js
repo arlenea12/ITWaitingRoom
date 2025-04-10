@@ -4,11 +4,9 @@
 
 (function () {
   // Spotify API client ID (used to identify your app)
-  const client_id = 'cde3eaa90edd4d8893a89046e3056912';
-  // The URL to which Spotify will redirect after the user authorizes the app
-  const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
-  // The permissions (scopes) the app needs from the user to control playback and access track info
-  const scopes = 'streaming user-modify-playback-state user-read-playback-state user-read-currently-playing';
+  const client_id = 'cde3eaa90edd4d8893a89046e3056912'; // Your Spotify Client ID
+  const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/'; // Your Redirect URI
+  const scopes = 'streaming user-modify-playback-state user-read-playback-state user-read-currently-playing'; // The scopes your app requires
 
   // Function to extract the access token from the URL after user authorization
   function getAccessTokenFromUrl() {
@@ -19,7 +17,7 @@
       if (token) {
         localStorage.setItem('spotify_access_token', token); // Store the token in localStorage for future use
       }
-      window.location.hash = ''; // Clear the URL hash after extracting the token
+      window.location.hash = ''; // Clean up the URL by removing the hash
       return token;
     }
     return null; // Return null if no access token is found
@@ -176,6 +174,11 @@
 
       // Fetch track info and update UI
       function updateTrackInfo(data) {
+        if (!data || !data.item) {
+          console.log('No track is currently playing.');
+          return; // Exit early if no track data is available
+        }
+
         const trackName = data.item.name; // Get track name
         const artistName = data.item.artists.map(artist => artist.name).join(', '); // Get artist(s) name(s)
         const albumArtUrl = data.item.album.images[0].url; // Get album artwork URL
