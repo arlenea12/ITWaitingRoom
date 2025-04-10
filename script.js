@@ -128,6 +128,41 @@ player.addListener('player_state_changed', state => {
         repeatBtn.textContent = 'Repeat Off';
         volumeSlider.parentElement.appendChild(repeatBtn);
 
+        // Hook up core button listeners after player is ready
+        shuffleBtn.addEventListener('click', () => {
+          isShuffling = !isShuffling;
+          fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${isShuffling}&device_id=${currentDeviceId}`, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + token }
+          }).then(() => {
+            shuffleBtn.textContent = isShuffling ? 'Disable Shuffle' : 'Enable Shuffle';
+            console.log("Shuffle toggled:", isShuffling);
+          });
+        });
+
+        playPauseBtn.addEventListener('click', () => {
+          if (isPaused) {
+            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${currentDeviceId}`, {
+              method: 'PUT',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+              }
+            }).then(() => console.log("Playback resumed"));
+          } else {
+            fetch('https://api.spotify.com/v1/me/player/pause', {
+              method: 'PUT',
+              headers: { 'Authorization': 'Bearer ' + token }
+            }).then(() => console.log("Playback paused"));
+          }
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+          const volume = parseInt(e.target.value) / 100;
+          player.setVolume(volume).then(() => console.log('Volume set to', volume));
+        });
+    
+
         const progressContainer = document.createElement('div');
         progressContainer.style.marginTop = '10px';
         const progress = document.createElement('input');
@@ -235,6 +270,41 @@ player.addListener('player_state_changed', state => {
         repeatBtn.id = 'repeatButton';
         repeatBtn.textContent = 'Repeat Off';
         volumeSlider.parentElement.appendChild(repeatBtn);
+
+        // Hook up core button listeners after player is ready
+        shuffleBtn.addEventListener('click', () => {
+          isShuffling = !isShuffling;
+          fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${isShuffling}&device_id=${currentDeviceId}`, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + token }
+          }).then(() => {
+            shuffleBtn.textContent = isShuffling ? 'Disable Shuffle' : 'Enable Shuffle';
+            console.log("Shuffle toggled:", isShuffling);
+          });
+        });
+
+        playPauseBtn.addEventListener('click', () => {
+          if (isPaused) {
+            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${currentDeviceId}`, {
+              method: 'PUT',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+              }
+            }).then(() => console.log("Playback resumed"));
+          } else {
+            fetch('https://api.spotify.com/v1/me/player/pause', {
+              method: 'PUT',
+              headers: { 'Authorization': 'Bearer ' + token }
+            }).then(() => console.log("Playback paused"));
+          }
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+          const volume = parseInt(e.target.value) / 100;
+          player.setVolume(volume).then(() => console.log('Volume set to', volume));
+        });
+    
 
         const progressContainer = document.createElement('div');
         progressContainer.style.marginTop = '10px';
