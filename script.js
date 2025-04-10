@@ -1,3 +1,7 @@
+// =======================
+// Spotify Web Player Script
+// =======================
+
 (function () {
   // Spotify API client ID (used to identify your app)
   const client_id = 'cde3eaa90edd4d8893a89046e3056912';
