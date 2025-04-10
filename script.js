@@ -10,7 +10,7 @@
 
   // Function to extract the access token from the URL after user authorization
   function getAccessTokenFromUrl() {
-    const hash = window.location.hash;
+    const hash = window.location.hash; // Get the URL hash (contains the access token)
     if (hash) {
       const urlParams = new URLSearchParams(hash.substring(1)); // Parse the URL hash
       const token = urlParams.get('access_token'); // Extract the access token from the URL
@@ -20,7 +20,7 @@
       window.location.hash = ''; // Clean up the URL by removing the hash
       return token;
     }
-    return null;
+    return null; // Return null if no access token is found
   }
 
   // Try to retrieve the token from localStorage first, otherwise extract it from the URL
@@ -186,9 +186,9 @@
       .then(res => res.json())
       .then(data => {
         if (data && data.item) {
-          updateTrackInfo(data.item); // Update track info if there's a track playing
+          updateTrackInfo(data.item);
         } else {
-          console.log('No track is currently playing.'); // Log if no track is playing
+          console.log('No track is currently playing.');
         }
       })
       .catch(err => {
@@ -197,4 +197,5 @@
     };
   }
 })();
+
 
