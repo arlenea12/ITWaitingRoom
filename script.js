@@ -1,3 +1,5 @@
+// script.js
+
 (function () {
   const client_id = 'cde3eaa90edd4d8893a89046e3056912';
   const redirect_uri = 'https://arlenea12.github.io/ITWaitingRoom/';
@@ -178,6 +180,20 @@ document.addEventListener('DOMContentLoaded', () => {
   progress.style.width = '100%';
   progressContainer.appendChild(progress);
   document.querySelector('.player-ui').appendChild(progressContainer);
+  const connectButton = document.createElement('button');
+  connectButton.textContent = 'Connect Player';
+  connectButton.style.marginTop = '20px';
+  connectButton.onclick = () => {
+    player.connect().then(success => {
+      if (success) {
+        console.log('Player connected!');
+      } else {
+        console.error('Player failed to connect');
+      }
+    });
+  };
+  document.querySelector('.player-ui').appendChild(connectButton);
+
 
   let repeatState = 'off';
 
