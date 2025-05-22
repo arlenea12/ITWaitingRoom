@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IT Department - Tier 3 Team</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Background Canvas for animated network effect -->
+  <canvas id="background-canvas"></canvas>
+
+  <div class="container">
+
+    <!-- Navigation Buttons -->
+    <nav class="custom-nav" aria-label="Section navigation">
+      <button onclick="window.location.href='index.html'">Home</button>
+      <button onclick="window.location.href='Tier1.html'">Tier 1</button>
+      <button onclick="window.location.href='Tier2.html'">Tier 2</button>
+      <button onclick="window.location.href='Tier3.html'">Tier 3</button>
+      <button onclick="window.open('https://open.spotify.com/playlist/0sXmN2Mjk4xmgeaABkSGAk', '_blank')">Spotify</button>
+    </nav>
+
+    <header>
+      <h1>Tier 3 Team</h1>
+      <p>Our frontline support technicians, the first point of contact for IT assistance.</p>
+    </header>
+
+    <section class="team">
+      <article class="team-member-card">
+        <img src="Photos/MarkBloom.jpg" alt="Mark Bloom" class="team-photo" />
+        <h2>Mark Bloom</h2>
+        <h3>Director of Information Technology</h3>
+        <p>Mark leads the IT department with over 20 years of experience in enterprise technology strategy, focusing on innovation and reliability.</p>
+      </article>
+
+      <article class="team-member-card">
+        <img src="Photos/MattKelley.jpg" alt="Matt Kelley" class="team-photo" />
+        <h2>Matt Kelley</h2>
+        <h3>Senior Systems Administrator</h3>
+        <p>Matt specializes in system architecture and cloud infrastructure, ensuring our platforms are secure and scalable.</p>
+      </article>
+
+      <article class="team-member-card">
+        <img src="Photos/BrianLeeson.jpg" alt="Brian Leeson" class="team-photo" />
+        <h2>Brian Leeson</h2>
+        <h3>Endpoint Deployment Specialist</h3>
+        <p>Brian oversees endpoint device deployments and lifecycle management, ensuring seamless user experiences.</p>
+      </article>
+
+      <article class="team-member-card">
+        <img src="Photos/TomSmith.jpg" alt="Tom Smith" class="team-photo" />
+        <h2>Tom Smith</h2>
+        <h3>IT Support Technician</h3>
+        <p>Tom is an up-and-coming technician dedicated to resolving issues quickly and efficiently.</p>
+      </article>
+    </section>
+  </div>
+
+  <!-- Background animation script -->
+  <script src="background.js"></script>
+</body>
+</html>

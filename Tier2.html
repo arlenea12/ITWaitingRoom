@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IT Department - Tier 2 Team</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Background Canvas for animated network effect -->
+  <canvas id="background-canvas"></canvas>
+
+  <div class="container">
+
+    <!-- Navigation Buttons -->
+    <nav class="custom-nav" aria-label="Section navigation">
+      <button onclick="window.location.href='index.html'">Home</button>
+      <button onclick="window.location.href='Tier1.html'">Tier 1</button>
+      <button onclick="window.location.href='Tier2.html'">Tier 2</button>
+      <button onclick="window.location.href='Tier3.html'">Tier 3</button>
+      <button onclick="window.open('https://open.spotify.com/playlist/0sXmN2Mjk4xmgeaABkSGAk', '_blank')">Spotify</button>
+    </nav>
+
+    <header>
+      <h1>Tier 2 Team</h1>
+      <p>Experienced technicians handling complex technical issues and escalations.</p>
+    </header>
+
+    <section class="team">
+      <article class="team-member-card">
+        <img src="Photos/BillCrandall.jpg" alt="Bill Crandall" class="team-photo" />
+        <h2>Bill Crandall</h2>
+        <h3>IT Service Desk Coordinator</h3>
+        <p>Bill coordinates support operations and manages service desk workflows to maximize customer satisfaction.</p>
+      </article>
+
+      <article class="team-member-card">
+        <img src="Photos/SethMcCullar.jpg" alt="Seth McCullar" class="team-photo" />
+        <h2>Seth McCullar</h2>
+        <h3>IT Support Specialist</h3>
+        <p>Seth is a specialist in automation and scripting, often described as our bot master.</p>
+      </article>
+
+      <article class="team-member-card">
+        <img src="Photos/ArleneAlvarado.jpg" alt="Arlene Alvarado" class="team-photo" />
+        <h2>Arlene Alvarado</h2>
+        <h3>IT Support Specialist</h3>
+        <p>Arlene excels in troubleshooting complex issues and is known for her exceptional Valorant skills.</p>
+      </article>
+    </section>
+  </div>
+
+  <!-- Background animation script -->
+  <script src="background.js"></script>
+</body>
+</html>

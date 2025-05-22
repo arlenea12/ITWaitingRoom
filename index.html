@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IT Department Waiting Room</title>
+
+  <!-- Link to CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Spotify SDK -->
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+</head>
+<body>
+
+  <!-- Animated Network Background Canvas -->
+  <canvas id="background-canvas"></canvas>
+
+  <!-- Main container -->
+  <div class="container">
+    <header>
+      <h1>Welcome to the IT Department</h1>
+      <p>
+        Take a break, jam out to some tunes, and get to know the faces behind your tech magic.
+        We’re here to help, so enjoy the vibes while you wait!
+      </p>
+    </header>
+
+    <!-- Navigation Buttons -->
+<nav class="custom-nav" aria-label="Section navigation">
+  <button onclick="window.location.href='index.html'">Home</button>
+  <button onclick="window.location.href='Tier1.html'">Tier 1</button>
+  <button onclick="window.location.href='Tier2.html'">Tier 2</button>
+  <button onclick="window.location.href='Tier3.html'">Tier 3</button>
+  <button onclick="window.open('https://open.spotify.com/playlist/0sXmN2Mjk4xmgeaABkSGAk', '_blank')">Spotify</button>
+</nav>
+
+
+   <!-- Team Section -->
+<section class="team-section" id="team">
+  <h2>Meet the Team</h2>
+  <div class="team">
+    <div class="team-member">
+      <h3>Mark Bloom</h3>
+      <p><strong>Director of Information Technology</strong></p>
+    </div>
+
+    <div class="team-member">
+      <h3>Matt Kelley</h3>
+      <p><strong>Senior Systems Administrator</strong></p>
+    </div>
+
+    <div class="team-member">
+      <h3>Bill Crandall</h3>
+      <p><strong>IT Service Desk Coordinator</strong></p>
+    </div>
+
+    <div class="team-member">
+      <h3>Brian Leeson</h3>
+      <p><strong>Endpoint Deployment Specialist</strong></p>
+    </div>
+
+    <div class="team-member">
+      <h3>Tom Smith</h3>
+      <p><strong>Systems Administrator</strong></p>
+    </div>
+
+     <div class="team-member">
+      <h3>Kyle Hardiman</h3>
+      <p><strong>Systems Administrator</strong></p>
+    </div>
+
+    <div class="team-member">
+      <h3>Arlene Alvarado</h3>
+      <p><strong>IT Support Specialist</strong></p>
+    </div>
+
+    <div class="team-member">
+      <h3>Seth McCullar</h3>
+      <p><strong>IT Support Specialist</strong></p>
+    </div>
+
+    <div class="team-member">
+      <h3>Ashley Clark</h3>
+      <p><strong>IT Support Technician</strong></p>
+    </div>
+
+    <div class="team-member">
+      <h3>Jacob Rollinger</h3>
+      <p><strong>IT Support Technician</strong></p>
+    </div>
+
+    <div class="team-member">
+      <h3>Ian Lawson</h3>
+      <p><strong>IT Support Technician</strong></p>
+    </div>
+  </div>
+</section>
+
+    <!-- Spotify Player Section -->
+    <section class="spotify" id="spotify">
+      <h2>Now Playing</h2>
+      <div class="player-ui">
+        <img id="albumArt" src="" alt="Album Art" />
+        <h2 id="trackName">Track Name</h2>
+        <h4 id="artistName">Artist Name</h4>
+
+        <div class="controls" role="group" aria-label="Playback controls">
+          <button id="shuffleButton" aria-pressed="false">Enable Shuffle</button>
+          <button id="playPauseButton" aria-label="Play/Pause">Pause</button>
+          <button id="nextBtn" aria-label="Next Track">Next</button>
+          <button id="prevBtn" aria-label="Previous Track">Previous</button>
+          <button id="repeatBtn" aria-label="Repeat mode">Repeat Off</button>
+          <label for="volumeControl">Volume:</label>
+          <input type="range" id="volumeControl" min="0" max="100" value="50" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Background network animation -->
+  <script src="background.js"></script>
+
+  <!-- Spotify player script -->
+  <script src="script.js"></script>
+</body>
+</html>
